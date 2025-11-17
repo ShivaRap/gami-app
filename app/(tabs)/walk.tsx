@@ -233,7 +233,7 @@ export default function WalkScreen() {
                 styles.description,
                 { color: Colors[colorScheme ?? 'light'].text },
               ]}>
-              Start your interval walking session. You'll walk for 30 minutes total:
+              Start your interval walking session. You’ll walk for 30 minutes total:
             </Text>
             <View style={styles.instructions}>
               <View style={styles.instructionRow}>
