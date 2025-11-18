@@ -1,7 +1,7 @@
 import { AnimatedButton } from '@/components/ui/animated-button';
 import { FastPaceView } from '@/components/walk/FastPaceView';
 import { SlowPaceView } from '@/components/walk/SlowPaceView';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 import { useBottomNav } from '@/contexts/BottomNavContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
@@ -307,12 +307,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: Fonts.heading,
+    letterSpacing: 1,
   },
   description: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 26,
+    fontFamily: Fonts.body,
   },
   instructions: {
     alignItems: 'center',
@@ -333,10 +336,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#11181C',
+    fontFamily: Fonts.body,
   },
   instructionText: {
     fontSize: 18,
     fontWeight: '500',
+    fontFamily: Fonts.body,
   },
   instructionArrow: {
     fontSize: 24,
@@ -347,6 +352,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontStyle: 'italic',
     opacity: 0.7,
+    fontFamily: Fonts.body,
   },
   startButton: {
     minWidth: 200,

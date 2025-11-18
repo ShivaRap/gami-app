@@ -14,7 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { setOnboardingComplete } from '@/utils/storage';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AnimatedButton } from '@/components/ui/animated-button';
 import { PaginationDots } from '@/components/ui/pagination-dots';
@@ -151,6 +151,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
     color: '#11181C',
+    fontFamily: Fonts.heading,
+    letterSpacing: 1,
   },
   cardDescription: {
     fontSize: 18,
@@ -158,6 +160,7 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     color: '#11181C',
     marginBottom: 32,
+    fontFamily: Fonts.body,
   },
   buttonContainer: {
     marginTop: 24,
@@ -167,5 +170,4 @@ const styles = StyleSheet.create({
     minWidth: 200,
   },
 });
-
 

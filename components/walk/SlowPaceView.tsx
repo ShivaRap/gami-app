@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Fonts } from '@/constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import LottieView from 'lottie-react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface SlowPaceViewProps {
   phaseTimeRemaining: string;
@@ -44,12 +45,15 @@ export function SlowPaceView({
         <Text style={styles.title}>Slow Pace</Text>
       </TouchableOpacity>
 
-      {/* Lottie placeholder with gradient overlay */}
+      {/* Lottie animation with gradient overlay */}
       <View style={styles.lottieContainer}>
-        <View style={styles.lottiePlaceholder}>
-          {/* Placeholder for Lottie animation */}
-          <Text style={styles.lottiePlaceholderText}>🎵</Text>
-        </View>
+        <LottieView
+          source={require('@/assets/animations/slow-pace-walk.json')}
+          autoPlay
+          loop
+          style={styles.lottieAnimation}
+          speed={isPaused ? 0 : 1}
+        />
         <LinearGradient
           colors={['transparent', SLOW_PACE_BG]}
           locations={[0.3, 1]}
@@ -105,15 +109,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#1A1A1A',
-    fontFamily: Fonts?.rounded,
+    fontFamily: Fonts.body,
   },
   title: {
     fontSize: 36,
     fontWeight: '700',
     color: SLOW_PACE_TEXT,
     marginBottom: 32,
-    fontFamily: Fonts?.rounded,
+    fontFamily: Fonts.heading,
     textAlign: 'center',
+    letterSpacing: 1,
   },
   lottieContainer: {
     width: 200,
@@ -123,16 +128,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  lottiePlaceholder: {
+  lottieAnimation: {
     width: '100%',
     height: '100%',
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 16,
-  },
-  lottiePlaceholderText: {
-    fontSize: 80,
   },
   gradientOverlay: {
     position: 'absolute',
@@ -143,12 +141,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   timer: {
-    fontSize: 72,
+    fontSize: 118,
     fontWeight: '700',
     color: SLOW_PACE_TEXT,
     marginBottom: 32,
-    fontFamily: Fonts?.rounded,
+    fontFamily: Fonts.body,
     textAlign: 'center',
+    letterSpacing: 1.2,
     // Subtle inset shadow effect
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 0, height: 2 },
@@ -176,7 +175,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: SLOW_PACE_TEXT,
-    fontFamily: Fonts?.rounded,
+    fontFamily: Fonts.body,
   },
   stopSessionButton: {
     paddingVertical: 8,
@@ -186,7 +185,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: SLOW_PACE_TEXT,
     opacity: 0.7,
-    fontFamily: Fonts?.rounded,
+    fontFamily: Fonts.body,
   },
 });
-

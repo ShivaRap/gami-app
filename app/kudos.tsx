@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useBottomNav } from '@/contexts/BottomNavContext';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function KudosScreen() {
@@ -41,7 +41,7 @@ export default function KudosScreen() {
           🎉
         </Text>
         <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
-          Great Job!
+          Session Complete!
         </Text>
         <Text
           style={[
@@ -74,12 +74,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: Fonts.heading,
+    letterSpacing: 1,
   },
   message: {
     fontSize: 20,
     textAlign: 'center',
     lineHeight: 28,
+    fontFamily: Fonts.body,
   },
 });
-
 
