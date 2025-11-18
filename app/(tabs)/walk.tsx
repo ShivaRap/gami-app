@@ -21,17 +21,11 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Get color for phase
-function getPhaseColor(phase: Phase, colorScheme: 'light' | 'dark' | null | undefined): string {
-  return phase === 'slow'
-    ? Colors[colorScheme ?? 'light'].pastel.blue
-    : Colors[colorScheme ?? 'light'].pastel.pink;
-}
-
 export default function WalkScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const { hide, show } = useBottomNav();
+  const palette = Colors[colorScheme ?? 'light'];
   
   // Session state
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -190,8 +184,9 @@ export default function WalkScreen() {
       if (longPressTimerRef.current) {
         clearTimeout(longPressTimerRef.current);
       }
+      show();
     };
-  }, []);
+  }, [show]);
 
   const handleStartSession = () => {
     setIsSessionActive(true);
@@ -213,25 +208,25 @@ export default function WalkScreen() {
     router.push('/kudos');
   };
 
-  const phaseColor = getPhaseColor(currentPhase, colorScheme);
+  const phaseColor = currentPhase === 'slow' ? palette.pastel.blue : palette.pastel.pink;
   const formattedPhaseTime = formatTime(phaseTimeRemaining);
 
   return (
     <SafeAreaView
       style={[
         styles.container,
-        { backgroundColor: Colors[colorScheme ?? 'light'].background },
+        { backgroundColor: palette.background },
       ]}>
       <View style={styles.content}>
         {!isSessionActive ? (
           <>
-            <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
+            <Text style={[styles.title, { color: palette.text }]}>
               Ready to Walk?
             </Text>
             <Text
               style={[
                 styles.description,
-                { color: Colors[colorScheme ?? 'light'].text },
+                { color: palette.text },
               ]}>
               Start your interval walking session. You’ll walk for 30 minutes total:
             </Text>
@@ -240,30 +235,30 @@ export default function WalkScreen() {
                 <View
                   style={[
                     styles.instructionBadge,
-                    { backgroundColor: Colors[colorScheme ?? 'light'].pastel.blue },
+                    { backgroundColor: palette.pastel.blue },
                   ]}>
                   <Text style={styles.instructionBadgeText}>3 min</Text>
                 </View>
-                <Text style={[styles.instructionText, { color: Colors[colorScheme ?? 'light'].text }]}>
+                <Text style={[styles.instructionText, { color: palette.text }]}>
                   Slow pace
                 </Text>
               </View>
-              <Text style={[styles.instructionArrow, { color: Colors[colorScheme ?? 'light'].text }]}>
+              <Text style={[styles.instructionArrow, { color: palette.text }]}>
                 ↓
               </Text>
               <View style={styles.instructionRow}>
                 <View
                   style={[
                     styles.instructionBadge,
-                    { backgroundColor: Colors[colorScheme ?? 'light'].pastel.pink },
+                    { backgroundColor: palette.pastel.pink },
                   ]}>
                   <Text style={styles.instructionBadgeText}>3 min</Text>
                 </View>
-                <Text style={[styles.instructionText, { color: Colors[colorScheme ?? 'light'].text }]}>
+                <Text style={[styles.instructionText, { color: palette.text }]}>
                   Fast pace
                 </Text>
               </View>
-              <Text style={[styles.instructionRepeat, { color: Colors[colorScheme ?? 'light'].text }]}>
+              <Text style={[styles.instructionRepeat, { color: palette.text }]}>
                 Repeat 5 times
               </Text>
             </View>
@@ -276,7 +271,7 @@ export default function WalkScreen() {
           </>
         ) : (
           <>
-            <Text style={[styles.sessionTitle, { color: Colors[colorScheme ?? 'light'].text }]}>
+            <Text style={[styles.sessionTitle, { color: palette.text }]}>
               Session in Progress
             </Text>
             {devMode && (
@@ -295,20 +290,20 @@ export default function WalkScreen() {
                 }
               }}>
               <View style={styles.timerContainer}>
-                <Text style={[styles.timerLabel, { color: Colors[colorScheme ?? 'light'].text }]}>
+                <Text style={[styles.timerLabel, { color: palette.text }]}>
                   Current Phase
                 </Text>
                 <Text style={[styles.timerValue, { color: phaseColor }]}>
                   {currentPhase === 'slow' ? 'Slow Pace' : 'Fast Pace'}
                 </Text>
-                <Text style={[styles.timerTime, { color: Colors[colorScheme ?? 'light'].text }]}>
+                <Text style={[styles.timerTime, { color: palette.text }]}>
                   {formattedPhaseTime}
                 </Text>
-                <Text style={[styles.intervalLabel, { color: Colors[colorScheme ?? 'light'].text }]}>
+                <Text style={[styles.intervalLabel, { color: palette.text }]}>
                   Interval {currentInterval} of {TOTAL_INTERVALS}
                 </Text>
                 {devMode && (
-                  <Text style={[styles.devHint, { color: Colors[colorScheme ?? 'light'].text }]}>
+                  <Text style={[styles.devHint, { color: palette.text }]}>
                     Double tap to skip phase
                   </Text>
                 )}
