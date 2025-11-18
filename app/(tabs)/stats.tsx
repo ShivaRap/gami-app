@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,18 @@ interface SessionStats {
 const hasStats = false;
 const recentSession: SessionStats | null = null;
 
-const researchLinks = [
+type ResearchLink = Readonly<{
+  title: string;
+  url: string;
+}>;
+
+type InstructionStep = Readonly<{
+  number: string;
+  text: string;
+  accent: keyof typeof Colors.light.pastel;
+}>;
+
+const researchLinks: ResearchLink[] = [
   {
     title: 'Interval Walking Research',
     url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4241367/',
@@ -32,8 +43,29 @@ const researchLinks = [
   },
 ];
 
+const instructionSteps: InstructionStep[] = [
+  {
+    number: '1',
+    text: 'Start with 3 minutes of slow-paced walking',
+    accent: 'pink',
+  },
+  {
+    number: '2',
+    text: 'Switch to 3 minutes of fast-paced walking',
+    accent: 'blue',
+  },
+  {
+    number: '3',
+    text: 'Repeat for a total of 30 minutes',
+    accent: 'green',
+  },
+];
+
 export default function StatsScreen() {
-  const colorScheme = useColorScheme();
+  const theme = useColorScheme() ?? 'light';
+  const palette = Colors[theme];
+  const instructionNumberTextColor =
+    theme === 'dark' ? palette.background : palette.text;
   const [stats] = useState<SessionStats | null>(recentSession);
   const [hasCompletedSessions] = useState(hasStats);
 
@@ -42,94 +74,78 @@ export default function StatsScreen() {
     // Placeholder: Load stats from AsyncStorage
   }, []);
 
-  const handleLinkPress = (url: string) => {
-    Linking.openURL(url).catch((err) =>
-      console.error('Failed to open URL:', err)
-    );
-  };
+  const handleLinkPress = useCallback((url: string) => {
+    Linking.openURL(url).catch((error: unknown) => {
+      console.error('Failed to open URL:', error);
+    });
+  }, []);
 
   if (!hasCompletedSessions) {
     return (
       <SafeAreaView
         style={[
           styles.container,
-          { backgroundColor: Colors[colorScheme ?? 'light'].background },
+          { backgroundColor: palette.background },
         ]}>
         <ScrollView
           contentContainerStyle={styles.emptyContent}
           showsVerticalScrollIndicator={false}>
           <View style={styles.emptyState}>
-            <Text style={[styles.emptyTitle, { color: Colors[colorScheme ?? 'light'].text }]}>
+            <Text style={[styles.emptyTitle, { color: palette.text }]}>
               Welcome to Gāmi!
             </Text>
             <Text
               style={[
                 styles.emptyDescription,
-                { color: Colors[colorScheme ?? 'light'].text },
+                { color: palette.text },
               ]}>
               Get started with your first interval walking session. Here’s how it works:
             </Text>
             <View style={styles.instructionsContainer}>
-              <View style={styles.instructionItem}>
-                <View
-                  style={[
-                    styles.instructionNumber,
-                    { backgroundColor: Colors[colorScheme ?? 'light'].pastel.pink },
-                  ]}>
-                  <Text style={styles.instructionNumberText}>1</Text>
+              {instructionSteps.map((step) => (
+                <View key={step.number} style={styles.instructionItem}>
+                  <View
+                    style={[
+                      styles.instructionNumber,
+                      { backgroundColor: palette.pastel[step.accent] },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.instructionNumberText,
+                        { color: instructionNumberTextColor },
+                      ]}>
+                      {step.number}
+                    </Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: palette.text }]}>
+                    {step.text}
+                  </Text>
                 </View>
-                <Text style={[styles.instructionText, { color: Colors[colorScheme ?? 'light'].text }]}>
-                  Start with 3 minutes of slow-paced walking
-                </Text>
-              </View>
-              <View style={styles.instructionItem}>
-                <View
-                  style={[
-                    styles.instructionNumber,
-                    { backgroundColor: Colors[colorScheme ?? 'light'].pastel.blue },
-                  ]}>
-                  <Text style={styles.instructionNumberText}>2</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: Colors[colorScheme ?? 'light'].text }]}>
-                  Switch to 3 minutes of fast-paced walking
-                </Text>
-              </View>
-              <View style={styles.instructionItem}>
-                <View
-                  style={[
-                    styles.instructionNumber,
-                    { backgroundColor: Colors[colorScheme ?? 'light'].pastel.green },
-                  ]}>
-                  <Text style={styles.instructionNumberText}>3</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: Colors[colorScheme ?? 'light'].text }]}>
-                  Repeat for a total of 30 minutes
-                </Text>
-              </View>
+              ))}
             </View>
             <View style={styles.researchSection}>
               <Text
                 style={[
                   styles.researchTitle,
-                  { color: Colors[colorScheme ?? 'light'].text },
+                  { color: palette.text },
                 ]}>
                 Learn More
               </Text>
-              {researchLinks.map((link, index) => (
+              {researchLinks.map((link) => (
                 <TouchableOpacity
-                  key={index}
+                  key={link.title}
                   onPress={() => handleLinkPress(link.url)}
                   style={[
                     styles.researchLink,
                     {
-                      backgroundColor: Colors[colorScheme ?? 'light'].cardBackground,
-                      borderColor: Colors[colorScheme ?? 'light'].border,
+                      backgroundColor: palette.cardBackground,
+                      borderColor: palette.border,
                     },
                   ]}>
                   <Text
                     style={[
                       styles.researchLinkText,
-                      { color: Colors[colorScheme ?? 'light'].pastel.blue },
+                      { color: palette.pastel.blue },
                     ]}>
                     {link.title} →
                   </Text>
@@ -146,12 +162,12 @@ export default function StatsScreen() {
     <SafeAreaView
       style={[
         styles.container,
-        { backgroundColor: Colors[colorScheme ?? 'light'].background },
+        { backgroundColor: palette.background },
       ]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
-        <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
+        <Text style={[styles.title, { color: palette.text }]}>
           Your Stats
         </Text>
         {stats && (
@@ -159,14 +175,14 @@ export default function StatsScreen() {
             style={[
               styles.statsCard,
               {
-                backgroundColor: Colors[colorScheme ?? 'light'].cardBackground,
-                borderColor: Colors[colorScheme ?? 'light'].border,
+                backgroundColor: palette.cardBackground,
+                borderColor: palette.border,
               },
             ]}>
             <Text
               style={[
                 styles.statsCardTitle,
-                { color: Colors[colorScheme ?? 'light'].text },
+                { color: palette.text },
               ]}>
               Most Recent Session
             </Text>
@@ -175,14 +191,14 @@ export default function StatsScreen() {
                 <Text
                   style={[
                     styles.statValue,
-                    { color: Colors[colorScheme ?? 'light'].pastel.pink },
+                    { color: palette.pastel.pink },
                   ]}>
                   {stats.duration}
                 </Text>
                 <Text
                   style={[
                     styles.statLabel,
-                    { color: Colors[colorScheme ?? 'light'].text },
+                    { color: palette.text },
                   ]}>
                   Minutes
                 </Text>
@@ -191,14 +207,14 @@ export default function StatsScreen() {
                 <Text
                   style={[
                     styles.statValue,
-                    { color: Colors[colorScheme ?? 'light'].pastel.blue },
+                    { color: palette.pastel.blue },
                   ]}>
                   {stats.intervals}
                 </Text>
                 <Text
                   style={[
                     styles.statLabel,
-                    { color: Colors[colorScheme ?? 'light'].text },
+                    { color: palette.text },
                   ]}>
                   Intervals
                 </Text>
@@ -207,7 +223,7 @@ export default function StatsScreen() {
             <Text
               style={[
                 styles.statsDate,
-                { color: Colors[colorScheme ?? 'light'].text },
+                { color: palette.text },
               ]}>
               {stats.date}
             </Text>
