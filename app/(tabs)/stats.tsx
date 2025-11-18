@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   Linking,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/theme';
@@ -69,15 +70,20 @@ export default function StatsScreen() {
   const [stats] = useState<SessionStats | null>(recentSession);
   const [hasCompletedSessions] = useState(hasStats);
 
-  // In a real app, load stats from storage here
-  useEffect(() => {
-    // Placeholder: Load stats from AsyncStorage
-  }, []);
+  const handleLinkPress = useCallback(async (url: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
 
-  const handleLinkPress = useCallback((url: string) => {
-    Linking.openURL(url).catch((error: unknown) => {
+      if (!supported) {
+        Alert.alert('Unable to open link', 'This URL is not supported on your device.');
+        return;
+      }
+
+      await Linking.openURL(url);
+    } catch (error) {
       console.error('Failed to open URL:', error);
-    });
+      Alert.alert('Unable to open link', 'Please try again later.');
+    }
   }, []);
 
   if (!hasCompletedSessions) {
