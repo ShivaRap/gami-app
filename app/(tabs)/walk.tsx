@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -210,6 +210,15 @@ export default function WalkScreen() {
 
   const phaseColor = currentPhase === 'slow' ? palette.pastel.blue : palette.pastel.pink;
   const formattedPhaseTime = formatTime(phaseTimeRemaining);
+  const sessionProgress = useMemo(() => {
+    return Math.min(totalElapsed / TOTAL_SESSION_DURATION, 1);
+  }, [totalElapsed]);
+  const sessionProgressPercent = Math.round(sessionProgress * 100);
+  const phaseProgress = useMemo(() => {
+    const elapsed = PHASE_DURATION - phaseTimeRemaining;
+    return Math.min(Math.max(elapsed, 0) / PHASE_DURATION, 1);
+  }, [phaseTimeRemaining]);
+  const phaseProgressPercent = Math.round(phaseProgress * 100);
 
   return (
     <SafeAreaView
@@ -290,25 +299,76 @@ export default function WalkScreen() {
                 }
               }}>
               <View style={styles.timerContainer}>
-                <Text style={[styles.timerLabel, { color: palette.text }]}>
+                <Text style={[styles.timerLabel, { color: palette.text }]}> 
                   Current Phase
                 </Text>
-                <Text style={[styles.timerValue, { color: phaseColor }]}>
+                <Text style={[styles.timerValue, { color: phaseColor }]}> 
                   {currentPhase === 'slow' ? 'Slow Pace' : 'Fast Pace'}
                 </Text>
-                <Text style={[styles.timerTime, { color: palette.text }]}>
+                <Text style={[styles.timerTime, { color: palette.text }]}> 
                   {formattedPhaseTime}
                 </Text>
-                <Text style={[styles.intervalLabel, { color: palette.text }]}>
+                <Text style={[styles.intervalLabel, { color: palette.text }]}> 
                   Interval {currentInterval} of {TOTAL_INTERVALS}
                 </Text>
                 {devMode && (
-                  <Text style={[styles.devHint, { color: palette.text }]}>
+                  <Text style={[styles.devHint, { color: palette.text }]}> 
                     Double tap to skip phase
                   </Text>
                 )}
               </View>
             </TouchableOpacity>
+            <View style={styles.progressSection}>
+              <View style={styles.progressHeader}>
+                <Text style={[styles.progressLabel, { color: palette.text }]}> 
+                  Session Progress
+                </Text>
+                <Text style={[styles.progressValue, { color: palette.text }]}> 
+                  {sessionProgressPercent}%
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.progressTrack,
+                  {
+                    backgroundColor: palette.cardBackground,
+                    borderColor: palette.border,
+                  },
+                ]}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    { width: `${sessionProgressPercent}%`, backgroundColor: phaseColor },
+                  ]}
+                />
+              </View>
+              <View style={styles.phaseProgressRow}>
+                <Text style={[styles.progressLabel, { color: palette.text }]}> 
+                  Current Phase
+                </Text>
+                <Text style={[styles.progressValue, { color: palette.text }]}> 
+                  {phaseProgressPercent}%
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.phaseTrack,
+                  {
+                    backgroundColor: palette.cardBackground,
+                    borderColor: palette.border,
+                  },
+                ]}>
+                <View
+                  style={[
+                    styles.phaseFill,
+                    { width: `${phaseProgressPercent}%`, backgroundColor: phaseColor },
+                  ]}
+                />
+              </View>
+              <Text style={[styles.phaseProgressLabel, { color: palette.text }]}> 
+                {currentPhase === 'slow' ? 'Slow pace' : 'Fast pace'} • {formattedPhaseTime} remaining
+              </Text>
+            </View>
             <AnimatedButton
               title="End Session"
               onPress={handleEndSession}
@@ -403,6 +463,56 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
     padding: 20,
+  },
+  progressSection: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  progressLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  progressValue: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  progressTrack: {
+    width: '100%',
+    height: 12,
+    borderRadius: 999,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 999,
+  },
+  phaseProgressRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  phaseTrack: {
+    width: '100%',
+    height: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  phaseFill: {
+    height: '100%',
+    borderRadius: 999,
+  },
+  phaseProgressLabel: {
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
   },
   timerLabel: {
     fontSize: 16,

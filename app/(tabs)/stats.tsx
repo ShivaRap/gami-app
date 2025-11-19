@@ -7,10 +7,12 @@ import {
   Linking,
   TouchableOpacity,
   Alert,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AnimatedButton } from '@/components/ui/animated-button';
 
 interface SessionStats {
   date: string;
@@ -86,6 +88,21 @@ export default function StatsScreen() {
     }
   }, []);
 
+  const handleSharePlan = useCallback(async () => {
+    const message =
+      'Try the Gāmi interval walking plan: 3 minutes slow pace, 3 minutes fast pace, repeat 5 times for a 30 minute walk. Learn more about the research that inspired it: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4241367/';
+
+    try {
+      await Share.share({
+        title: 'Gāmi Interval Walking Plan',
+        message,
+      });
+    } catch (error) {
+      console.error('Failed to share plan:', error);
+      Alert.alert('Unable to share', 'Please try again later.');
+    }
+  }, []);
+
   if (!hasCompletedSessions) {
     return (
       <SafeAreaView
@@ -157,6 +174,12 @@ export default function StatsScreen() {
                   </Text>
                 </TouchableOpacity>
               ))}
+              <AnimatedButton
+                title="Share the plan"
+                variant="outline"
+                onPress={handleSharePlan}
+                style={styles.shareButton}
+              />
             </View>
           </View>
         </ScrollView>
@@ -318,6 +341,9 @@ const styles = StyleSheet.create({
   researchLinkText: {
     fontSize: 16,
     fontWeight: '500',
+  },
+  shareButton: {
+    marginTop: 16,
   },
   statsCard: {
     padding: 20,
