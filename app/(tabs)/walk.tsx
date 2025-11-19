@@ -27,6 +27,7 @@ export default function WalkScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const { hide, show } = useBottomNav();
+  const palette = Colors[colorScheme ?? 'light'];
   
   // Session state
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -178,8 +179,9 @@ export default function WalkScreen() {
       if (longPressTimerRef.current) {
         clearTimeout(longPressTimerRef.current);
       }
+      show();
     };
-  }, []);
+  }, [show]);
 
   const handleStartSession = () => {
     setIsSessionActive(true);
@@ -214,7 +216,7 @@ export default function WalkScreen() {
     <SafeAreaView
       style={[
         styles.container,
-        { backgroundColor: Colors[colorScheme ?? 'light'].background },
+        { backgroundColor: palette.background },
       ]}>
       {!isSessionActive ? (
         <View style={styles.content}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Animated, {
+  type SharedValue,
   useAnimatedStyle,
   interpolate,
   withSpring,
@@ -11,7 +12,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 interface PaginationDotsProps {
   currentIndex: number;
   total: number;
-  scrollX: Animated.SharedValue<number>;
+  scrollX: SharedValue<number>;
   width: number;
 }
 

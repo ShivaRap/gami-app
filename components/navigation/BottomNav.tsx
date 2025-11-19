@@ -11,14 +11,14 @@ import * as Haptics from 'expo-haptics';
 import { useBottomNav } from '@/contexts/BottomNavContext';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { IconSymbol, type IconSymbolName } from '@/components/ui/icon-symbol';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface TabItem {
   name: string;
   route: string;
-  icon: string;
+  icon: IconSymbolName;
   label: string;
 }
 
