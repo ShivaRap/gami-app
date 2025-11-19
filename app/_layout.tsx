@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
-import { Text, TextInput } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { BottomNavProvider } from '@/contexts/BottomNavContext';
 import { useAppFonts } from '@/hooks/use-app-fonts';
-import { Fonts } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -62,17 +63,29 @@ export default function RootLayout() {
   }
 
   return (
-    <BottomNavProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="kudos" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </BottomNavProvider>
+    <SafeAreaProvider>
+      <BottomNavProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: Colors[colorScheme ?? 'light'].background,
+            }}>
+            <Stack>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="kudos" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+            </Stack>
+          </View>
+          <StatusBar
+            style={colorScheme === 'dark' ? 'light' : 'dark'}
+            translucent
+            backgroundColor="transparent"
+          />
+        </ThemeProvider>
+      </BottomNavProvider>
+    </SafeAreaProvider>
   );
 }
