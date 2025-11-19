@@ -1,12 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
-import { useBottomNav } from '@/contexts/BottomNavContext';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AnimatedButton } from '@/components/ui/animated-button';
+import { FastPaceView } from '@/components/walk/FastPaceView';
+import { SlowPaceView } from '@/components/walk/SlowPaceView';
+import { Colors, Fonts } from '@/constants/theme';
+import { useBottomNav } from '@/contexts/BottomNavContext';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
+import { useRouter } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Phase = 'slow' | 'fast';
 
@@ -29,6 +31,7 @@ export default function WalkScreen() {
   
   // Session state
   const [isSessionActive, setIsSessionActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<Phase>('slow');
   const [phaseTimeRemaining, setPhaseTimeRemaining] = useState(PHASE_DURATION);
   const [totalElapsed, setTotalElapsed] = useState(0);
@@ -36,9 +39,8 @@ export default function WalkScreen() {
   const [devMode, setDevMode] = useState(false);
   
   // Refs for timer and gesture handling
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const lastTapRef = useRef<number>(0);
-  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Calculate next phase
   const getNextPhase = useCallback((elapsed?: number): Phase | 'complete' => {
@@ -66,7 +68,7 @@ export default function WalkScreen() {
     }
 
     // Transition to next phase
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    impactAsync(ImpactFeedbackStyle.Medium);
     
     if (nextPhase === 'slow') {
       // Moving to slow pace means starting a new interval
@@ -100,13 +102,20 @@ export default function WalkScreen() {
       return newTotal;
     });
     
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    impactAsync(ImpactFeedbackStyle.Light);
     transitionToNextPhase();
   }, [devMode, transitionToNextPhase, currentInterval, currentPhase, phaseTimeRemaining]);
 
   // Handle timer tick
   useEffect(() => {
-    if (!isSessionActive) return;
+    if (!isSessionActive || isPaused) {
+      // Clear interval if session is inactive or paused
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
 
     intervalRef.current = setInterval(() => {
       setTotalElapsed((prevTotal) => {
@@ -143,7 +152,7 @@ export default function WalkScreen() {
         intervalRef.current = null;
       }
     };
-  }, [isSessionActive, transitionToNextPhase]);
+  }, [isSessionActive, isPaused, transitionToNextPhase]);
 
   // Handle long press for dev mode toggle
   const handleLongPress = useCallback(() => {
@@ -154,26 +163,12 @@ export default function WalkScreen() {
     longPressTimerRef.current = setTimeout(() => {
       setDevMode((prev) => {
         const newMode = !prev;
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        impactAsync(ImpactFeedbackStyle.Light);
         return newMode;
       });
       longPressTimerRef.current = null;
     }, 500); // 500ms for long press
   }, []);
-
-  // Handle double tap for skip phase
-  const handleDoubleTap = useCallback(() => {
-    const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300;
-
-    if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
-      // Double tap detected
-      skipToNextPhase();
-      lastTapRef.current = 0;
-    } else {
-      lastTapRef.current = now;
-    }
-  }, [skipToNextPhase]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -190,6 +185,7 @@ export default function WalkScreen() {
 
   const handleStartSession = () => {
     setIsSessionActive(true);
+    setIsPaused(false);
     setCurrentPhase('slow');
     setPhaseTimeRemaining(PHASE_DURATION);
     setTotalElapsed(0);
@@ -198,17 +194,22 @@ export default function WalkScreen() {
     hide(); // Hide bottom navigation bar
   };
 
+  const handlePauseResume = () => {
+    setIsPaused((prev) => !prev);
+    impactAsync(ImpactFeedbackStyle.Light);
+  };
+
   const handleEndSession = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
     setIsSessionActive(false);
+    setIsPaused(false);
     show(); // Restore bottom nav
     router.push('/kudos');
   };
 
-  const phaseColor = currentPhase === 'slow' ? palette.pastel.blue : palette.pastel.pink;
   const formattedPhaseTime = formatTime(phaseTimeRemaining);
 
   return (
@@ -217,107 +218,78 @@ export default function WalkScreen() {
         styles.container,
         { backgroundColor: palette.background },
       ]}>
-      <View style={styles.content}>
-        {!isSessionActive ? (
-          <>
-            <Text style={[styles.title, { color: palette.text }]}>
-              Ready to Walk?
-            </Text>
-            <Text
-              style={[
-                styles.description,
-                { color: palette.text },
-              ]}>
-              Start your interval walking session. You’ll walk for 30 minutes total:
-            </Text>
-            <View style={styles.instructions}>
-              <View style={styles.instructionRow}>
-                <View
-                  style={[
-                    styles.instructionBadge,
-                    { backgroundColor: palette.pastel.blue },
-                  ]}>
-                  <Text style={styles.instructionBadgeText}>3 min</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: palette.text }]}>
-                  Slow pace
-                </Text>
+      {!isSessionActive ? (
+        <View style={styles.content}>
+          <Text style={[styles.title, { color: Colors[colorScheme ?? 'light'].text }]}>
+            Ready to Walk?
+          </Text>
+          <Text
+            style={[
+              styles.description,
+              { color: Colors[colorScheme ?? 'light'].text },
+            ]}>
+            Start your interval walking session. You’ll walk for 30 minutes total:
+          </Text>
+          <View style={styles.instructions}>
+            <View style={styles.instructionRow}>
+              <View
+                style={[
+                  styles.instructionBadge,
+                  { backgroundColor: Colors[colorScheme ?? 'light'].pastel.blue },
+                ]}>
+                <Text style={styles.instructionBadgeText}>3 min</Text>
               </View>
-              <Text style={[styles.instructionArrow, { color: palette.text }]}>
-                ↓
-              </Text>
-              <View style={styles.instructionRow}>
-                <View
-                  style={[
-                    styles.instructionBadge,
-                    { backgroundColor: palette.pastel.pink },
-                  ]}>
-                  <Text style={styles.instructionBadgeText}>3 min</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: palette.text }]}>
-                  Fast pace
-                </Text>
-              </View>
-              <Text style={[styles.instructionRepeat, { color: palette.text }]}>
-                Repeat 5 times
+              <Text style={[styles.instructionText, { color: Colors[colorScheme ?? 'light'].text }]}>
+                Slow pace
               </Text>
             </View>
-            <AnimatedButton
-              title="Start Session"
-              onPress={handleStartSession}
-              variant="primary"
-              style={styles.startButton}
-            />
-          </>
-        ) : (
-          <>
-            <Text style={[styles.sessionTitle, { color: palette.text }]}>
-              Session in Progress
+            <Text style={[styles.instructionArrow, { color: Colors[colorScheme ?? 'light'].text }]}>
+              ↓
             </Text>
-            {devMode && (
-              <View style={styles.devBadge}>
-                <Text style={styles.devBadgeText}>DEV MODE</Text>
+            <View style={styles.instructionRow}>
+              <View
+                style={[
+                  styles.instructionBadge,
+                  { backgroundColor: Colors[colorScheme ?? 'light'].pastel.pink },
+                ]}>
+                <Text style={styles.instructionBadgeText}>3 min</Text>
               </View>
-            )}
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={handleDoubleTap}
-              onLongPress={handleLongPress}
-              onPressOut={() => {
-                if (longPressTimerRef.current) {
-                  clearTimeout(longPressTimerRef.current);
-                  longPressTimerRef.current = null;
-                }
-              }}>
-              <View style={styles.timerContainer}>
-                <Text style={[styles.timerLabel, { color: palette.text }]}>
-                  Current Phase
-                </Text>
-                <Text style={[styles.timerValue, { color: phaseColor }]}>
-                  {currentPhase === 'slow' ? 'Slow Pace' : 'Fast Pace'}
-                </Text>
-                <Text style={[styles.timerTime, { color: palette.text }]}>
-                  {formattedPhaseTime}
-                </Text>
-                <Text style={[styles.intervalLabel, { color: palette.text }]}>
-                  Interval {currentInterval} of {TOTAL_INTERVALS}
-                </Text>
-                {devMode && (
-                  <Text style={[styles.devHint, { color: palette.text }]}>
-                    Double tap to skip phase
-                  </Text>
-                )}
-              </View>
-            </TouchableOpacity>
-            <AnimatedButton
-              title="End Session"
-              onPress={handleEndSession}
-              variant="outline"
-              style={styles.endButton}
-            />
-          </>
-        )}
-      </View>
+              <Text style={[styles.instructionText, { color: Colors[colorScheme ?? 'light'].text }]}>
+                Fast pace
+              </Text>
+            </View>
+            <Text style={[styles.instructionRepeat, { color: Colors[colorScheme ?? 'light'].text }]}>
+              Repeat 5 times
+            </Text>
+          </View>
+          <AnimatedButton
+            title="Start Session"
+            onPress={handleStartSession}
+            variant="primary"
+            style={styles.startButton}
+          />
+        </View>
+      ) : currentPhase === 'slow' ? (
+        <SlowPaceView
+          phaseTimeRemaining={formattedPhaseTime}
+          isPaused={isPaused}
+          onPauseResume={handlePauseResume}
+          onStopSession={handleEndSession}
+          devMode={devMode}
+          onSkip={skipToNextPhase}
+          onLongPress={handleLongPress}
+        />
+      ) : (
+        <FastPaceView
+          phaseTimeRemaining={formattedPhaseTime}
+          isPaused={isPaused}
+          onPauseResume={handlePauseResume}
+          onStopSession={handleEndSession}
+          devMode={devMode}
+          onSkip={skipToNextPhase}
+          onLongPress={handleLongPress}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -337,12 +309,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: Fonts.heading,
+    letterSpacing: 1,
   },
   description: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 26,
+    fontFamily: Fonts.body,
   },
   instructions: {
     alignItems: 'center',
@@ -363,10 +338,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#11181C',
+    fontFamily: Fonts.body,
   },
   instructionText: {
     fontSize: 18,
     fontWeight: '500',
+    fontFamily: Fonts.body,
   },
   instructionArrow: {
     fontSize: 24,
@@ -377,60 +354,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontStyle: 'italic',
     opacity: 0.7,
+    fontFamily: Fonts.body,
   },
   startButton: {
-    minWidth: 200,
-  },
-  sessionTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  devBadge: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  devBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#000',
-  },
-  timerContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-    padding: 20,
-  },
-  timerLabel: {
-    fontSize: 16,
-    marginBottom: 8,
-    opacity: 0.7,
-  },
-  timerValue: {
-    fontSize: 32,
-    fontWeight: '700',
-    marginBottom: 16,
-  },
-  timerTime: {
-    fontSize: 48,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  intervalLabel: {
-    fontSize: 14,
-    opacity: 0.6,
-    marginTop: 8,
-  },
-  devHint: {
-    fontSize: 12,
-    opacity: 0.5,
-    marginTop: 8,
-    fontStyle: 'italic',
-  },
-  endButton: {
     minWidth: 200,
   },
 });

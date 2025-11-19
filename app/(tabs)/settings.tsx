@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { resetOnboarding } from '@/utils/storage';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AnimatedButton } from '@/components/ui/animated-button';
 
@@ -82,6 +82,8 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '700',
     marginBottom: 32,
+    fontFamily: Fonts.heading,
+    letterSpacing: 1,
   },
   section: {
     marginBottom: 32,
@@ -90,6 +92,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 16,
+    fontFamily: Fonts.body,
   },
   resetButton: {
     alignSelf: 'flex-start',
@@ -102,7 +105,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 16,
     opacity: 0.6,
+    fontFamily: Fonts.body,
   },
 });
-
 

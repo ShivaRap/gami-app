@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 interface SessionStats {
@@ -63,10 +63,7 @@ const instructionSteps: InstructionStep[] = [
 ];
 
 export default function StatsScreen() {
-  const theme = useColorScheme() ?? 'light';
-  const palette = Colors[theme];
-  const instructionNumberTextColor =
-    theme === 'dark' ? palette.background : palette.text;
+  const colorScheme = useColorScheme();
   const [stats] = useState<SessionStats | null>(recentSession);
   const [hasCompletedSessions] = useState(hasStats);
 
@@ -255,6 +252,8 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '700',
     marginBottom: 24,
+    fontFamily: Fonts.heading,
+    letterSpacing: 1,
   },
   emptyState: {
     flex: 1,
@@ -266,12 +265,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: Fonts.heading,
+    letterSpacing: 1,
   },
   emptyDescription: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 26,
+    fontFamily: Fonts.body,
   },
   instructionsContainer: {
     width: '100%',
@@ -294,11 +296,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#11181C',
+    fontFamily: Fonts.heading,
+    letterSpacing: 0.5,
   },
   instructionText: {
     fontSize: 16,
     flex: 1,
     lineHeight: 22,
+    fontFamily: Fonts.body,
   },
   researchSection: {
     width: '100%',
@@ -308,6 +313,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     marginBottom: 16,
+    fontFamily: Fonts.heading,
+    letterSpacing: 0.5,
   },
   researchLink: {
     padding: 16,
@@ -318,6 +325,7 @@ const styles = StyleSheet.create({
   researchLinkText: {
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: Fonts.body,
   },
   statsCard: {
     padding: 20,
@@ -329,6 +337,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 16,
+    fontFamily: Fonts.heading,
+    letterSpacing: 0.5,
   },
   statsRow: {
     flexDirection: 'row',
@@ -342,16 +352,19 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '700',
     marginBottom: 4,
+    fontFamily: Fonts.heading,
+    letterSpacing: 1,
   },
   statLabel: {
     fontSize: 14,
     opacity: 0.7,
+    fontFamily: Fonts.body,
   },
   statsDate: {
     fontSize: 14,
     opacity: 0.6,
     textAlign: 'center',
+    fontFamily: Fonts.body,
   },
 });
-
 

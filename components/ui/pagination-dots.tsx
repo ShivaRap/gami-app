@@ -19,8 +19,8 @@ interface PaginationDotsProps {
 interface PaginationDotProps {
   index: number;
   currentIndex: number;
+  scrollX: Animated.SharedValue<number>;
   width: number;
-  scrollX: SharedValue<number>;
   activeColor: string;
   inactiveColor: string;
 }
@@ -28,16 +28,12 @@ interface PaginationDotProps {
 function PaginationDot({
   index,
   currentIndex,
-  width,
   scrollX,
+  width,
   activeColor,
   inactiveColor,
 }: PaginationDotProps) {
-  const inputRange = [
-    (index - 1) * width,
-    index * width,
-    (index + 1) * width,
-  ];
+  const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
 
   const animatedStyle = useAnimatedStyle(() => {
     const scale = interpolate(scrollX.value, inputRange, [0.8, 1.2, 0.8], 'clamp');
@@ -49,14 +45,15 @@ function PaginationDot({
       ],
       opacity: withSpring(opacity, { damping: 15, stiffness: 150 }),
     };
-  });
+  }, [scrollX, width, index]);
 
   return (
     <Animated.View
       style={[
         styles.dot,
         {
-          backgroundColor: index === currentIndex ? activeColor : inactiveColor,
+          backgroundColor:
+            index === currentIndex ? activeColor : inactiveColor,
         },
         animatedStyle,
       ]}
@@ -71,7 +68,9 @@ export function PaginationDots({
   width,
 }: PaginationDotsProps) {
   const colorScheme = useColorScheme();
-  const palette = Colors[colorScheme ?? 'light'];
+  const theme = Colors[colorScheme ?? 'light'];
+  const pastelColor = theme.pastel.pink;
+  const inactiveColor = theme.border;
 
   return (
     <View style={styles.container}>
@@ -80,10 +79,10 @@ export function PaginationDots({
           key={index}
           index={index}
           currentIndex={currentIndex}
-          width={width}
           scrollX={scrollX}
-          activeColor={palette.pastel.pink}
-          inactiveColor={palette.border}
+          width={width}
+          activeColor={pastelColor}
+          inactiveColor={inactiveColor}
         />
       ))}
     </View>

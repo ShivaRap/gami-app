@@ -13,7 +13,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -104,6 +104,7 @@ export function AnimatedButton({
     const baseStyle: TextStyle = {
       fontSize: 16,
       fontWeight: '600',
+      fontFamily: Fonts.body,
     };
 
     if (variant === 'outline') {
@@ -136,5 +137,4 @@ export function AnimatedButton({
     </AnimatedTouchable>
   );
 }
-
 
