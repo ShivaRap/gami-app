@@ -1,16 +1,16 @@
-import { useEffect } from 'react';
-import { Text, TextInput, View } from 'react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { Text, TextInput, View } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors, Fonts } from '@/constants/theme';
 import { BottomNavProvider } from '@/contexts/BottomNavContext';
 import { useAppFonts } from '@/hooks/use-app-fonts';
-import { Colors, Fonts } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -21,10 +21,11 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontError) {
       console.error('Failed to load fonts:', fontError);
+      // Hide splash screen even if fonts failed to load
+      SplashScreen.hideAsync();
+      return;
     }
-  }, [fontError]);
 
-  useEffect(() => {
     if (!fontsLoaded) {
       return;
     }
@@ -56,9 +57,10 @@ export default function RootLayout() {
     ];
 
     SplashScreen.hideAsync();
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) {
+  // Don't render until fonts are loaded or failed to load
+  if (!fontsLoaded && !fontError) {
     return null;
   }
 
