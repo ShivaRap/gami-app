@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   TouchableOpacity,
-  StyleSheet,
   Text,
   ViewStyle,
   TextStyle,

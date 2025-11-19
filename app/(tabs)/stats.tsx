@@ -34,8 +34,8 @@ const researchLinks = [
 
 export default function StatsScreen() {
   const colorScheme = useColorScheme();
-  const [stats, setStats] = useState<SessionStats | null>(recentSession);
-  const [hasCompletedSessions, setHasCompletedSessions] = useState(hasStats);
+  const [stats] = useState<SessionStats | null>(recentSession);
+  const [hasCompletedSessions] = useState(hasStats);
 
   // In a real app, load stats from storage here
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function StatsScreen() {
                 styles.emptyDescription,
                 { color: Colors[colorScheme ?? 'light'].text },
               ]}>
-              Get started with your first interval walking session. Here's how it works:
+              Get started with your first interval walking session. Here’s how it works:
             </Text>
             <View style={styles.instructionsContainer}>
               <View style={styles.instructionItem}>
