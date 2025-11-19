@@ -66,6 +66,7 @@ export default function StatsScreen() {
   const colorScheme = useColorScheme();
   const [stats] = useState<SessionStats | null>(recentSession);
   const [hasCompletedSessions] = useState(hasStats);
+  const theme = Colors[colorScheme ?? 'light'];
 
   const handleLinkPress = useCallback(async (url: string) => {
     try {
@@ -88,21 +89,21 @@ export default function StatsScreen() {
       <SafeAreaView
         style={[
           styles.container,
-          { backgroundColor: palette.background },
+          { backgroundColor: theme.background },
         ]}>
         <ScrollView
           contentContainerStyle={styles.emptyContent}
           showsVerticalScrollIndicator={false}>
           <View style={styles.emptyState}>
-            <Text style={[styles.emptyTitle, { color: palette.text }]}>
+            <Text style={[styles.emptyTitle, { color: theme.text }]}>
               Welcome to Gāmi!
             </Text>
             <Text
               style={[
                 styles.emptyDescription,
-                { color: palette.text },
+                { color: theme.text },
               ]}>
-              Get started with your first interval walking session. Here’s how it works:
+              Get started with your first interval walking session. Here's how it works:
             </Text>
             <View style={styles.instructionsContainer}>
               {instructionSteps.map((step) => (
@@ -110,17 +111,17 @@ export default function StatsScreen() {
                   <View
                     style={[
                       styles.instructionNumber,
-                      { backgroundColor: palette.pastel[step.accent] },
+                      { backgroundColor: theme.pastel[step.accent] },
                     ]}>
                     <Text
                       style={[
                         styles.instructionNumberText,
-                        { color: instructionNumberTextColor },
+                        { color: theme.text },
                       ]}>
                       {step.number}
                     </Text>
                   </View>
-                  <Text style={[styles.instructionText, { color: palette.text }]}>
+                  <Text style={[styles.instructionText, { color: theme.text }]}>
                     {step.text}
                   </Text>
                 </View>
@@ -130,7 +131,7 @@ export default function StatsScreen() {
               <Text
                 style={[
                   styles.researchTitle,
-                  { color: palette.text },
+                  { color: theme.text },
                 ]}>
                 Learn More
               </Text>
@@ -141,14 +142,14 @@ export default function StatsScreen() {
                   style={[
                     styles.researchLink,
                     {
-                      backgroundColor: palette.cardBackground,
-                      borderColor: palette.border,
+                      backgroundColor: theme.cardBackground,
+                      borderColor: theme.border,
                     },
                   ]}>
                   <Text
                     style={[
                       styles.researchLinkText,
-                      { color: palette.pastel.blue },
+                      { color: theme.pastel.blue },
                     ]}>
                     {link.title} →
                   </Text>
@@ -165,12 +166,12 @@ export default function StatsScreen() {
     <SafeAreaView
       style={[
         styles.container,
-        { backgroundColor: palette.background },
+        { backgroundColor: theme.background },
       ]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
-        <Text style={[styles.title, { color: palette.text }]}>
+        <Text style={[styles.title, { color: theme.text }]}>
           Your Stats
         </Text>
         {stats && (
@@ -178,14 +179,14 @@ export default function StatsScreen() {
             style={[
               styles.statsCard,
               {
-                backgroundColor: palette.cardBackground,
-                borderColor: palette.border,
+                backgroundColor: theme.cardBackground,
+                borderColor: theme.border,
               },
             ]}>
             <Text
               style={[
                 styles.statsCardTitle,
-                { color: palette.text },
+                { color: theme.text },
               ]}>
               Most Recent Session
             </Text>
@@ -194,14 +195,14 @@ export default function StatsScreen() {
                 <Text
                   style={[
                     styles.statValue,
-                    { color: palette.pastel.pink },
+                    { color: theme.pastel.pink },
                   ]}>
                   {stats.duration}
                 </Text>
                 <Text
                   style={[
                     styles.statLabel,
-                    { color: palette.text },
+                    { color: theme.text },
                   ]}>
                   Minutes
                 </Text>
@@ -210,14 +211,14 @@ export default function StatsScreen() {
                 <Text
                   style={[
                     styles.statValue,
-                    { color: palette.pastel.blue },
+                    { color: theme.pastel.blue },
                   ]}>
                   {stats.intervals}
                 </Text>
                 <Text
                   style={[
                     styles.statLabel,
-                    { color: palette.text },
+                    { color: theme.text },
                   ]}>
                   Intervals
                 </Text>
@@ -226,7 +227,7 @@ export default function StatsScreen() {
             <Text
               style={[
                 styles.statsDate,
-                { color: palette.text },
+                { color: theme.text },
               ]}>
               {stats.date}
             </Text>
