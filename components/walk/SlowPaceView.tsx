@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 56,
   },
   devSkipButton: {
     position: 'absolute',
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   timer: {
-    fontSize: 160,
+    fontSize: 140,
     fontWeight: '700',
     color: SLOW_PACE_TEXT,
     marginTop: 0,
@@ -149,8 +149,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bodyBlack,
     textAlign: 'center',
     letterSpacing: -8,
-    paddingHorizontal: 8,
-    width: '100%',
+    paddingHorizontal: 4,
   },
   pauseResumeButton: {
     backgroundColor: SLOW_PACE_BG,
