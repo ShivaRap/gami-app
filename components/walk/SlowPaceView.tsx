@@ -1,6 +1,7 @@
 import { Fonts } from '@/constants/theme';
 import LottieView from 'lottie-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface SlowPaceViewProps {
   phaseTimeRemaining: string;
@@ -24,61 +25,61 @@ export function SlowPaceView({
   onSkip,
   onLongPress,
 }: SlowPaceViewProps) {
+  const insets = useSafeAreaInsets();
+  
   return (
     <View style={styles.container}>
       {/* DEV: Skip chip */}
       {devMode && (
         <TouchableOpacity
-          style={styles.devSkipButton}
+          style={[styles.devSkipButton, { top: insets.top + 12 }]}
           onPress={onSkip}
           activeOpacity={0.7}>
           <Text style={styles.devSkipText}>DEV: Skip</Text>
         </TouchableOpacity>
       )}
 
-      {/* Card-like content container */}
-      <View style={styles.cardContainer}>
-        <View style={styles.content}>
-          {/* Title */}
-          <TouchableOpacity
-            onLongPress={onLongPress}
-            activeOpacity={1}
-            delayLongPress={500}>
-            <Text style={styles.title}>SLOW PACE</Text>
-          </TouchableOpacity>
+      {/* Content */}
+      <View style={styles.content}>
+        {/* Title */}
+        <TouchableOpacity
+          onLongPress={onLongPress}
+          activeOpacity={1}
+          delayLongPress={500}>
+          <Text style={styles.title}>SLOW PACE</Text>
+        </TouchableOpacity>
 
-          {/* Lottie animation with shadow */}
-          <View style={styles.lottieContainer}>
-            <LottieView
-              source={require('@/assets/animations/slow-pace-walk.json')}
-              autoPlay
-              loop
-              style={styles.lottieAnimation}
-              speed={isPaused ? 0 : 1}
-            />
-          </View>
-
-          {/* Timer */}
-          <Text style={styles.timer}>{phaseTimeRemaining}</Text>
-
-          {/* Pause/Resume Button */}
-          <TouchableOpacity
-            style={styles.pauseResumeButton}
-            onPress={onPauseResume}
-            activeOpacity={0.8}>
-            <Text style={styles.pauseResumeButtonText}>
-              {isPaused ? 'Resume' : 'Pause'}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Stop Session */}
-          <TouchableOpacity
-            style={styles.stopSessionButton}
-            onPress={onStopSession}
-            activeOpacity={0.7}>
-            <Text style={styles.stopSessionText}>Stop Session</Text>
-          </TouchableOpacity>
+        {/* Lottie animation with shadow */}
+        <View style={styles.lottieContainer}>
+          <LottieView
+            source={require('@/assets/animations/slow-pace-walk.json')}
+            autoPlay
+            loop
+            style={styles.lottieAnimation}
+            speed={isPaused ? 0 : 1}
+          />
         </View>
+
+        {/* Timer */}
+        <Text style={styles.timer}>{phaseTimeRemaining}</Text>
+
+        {/* Pause/Resume Button */}
+        <TouchableOpacity
+          style={styles.pauseResumeButton}
+          onPress={onPauseResume}
+          activeOpacity={0.8}>
+          <Text style={styles.pauseResumeButtonText}>
+            {isPaused ? 'Resume' : 'Pause'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Stop Session */}
+        <TouchableOpacity
+          style={styles.stopSessionButton}
+          onPress={onStopSession}
+          activeOpacity={0.7}>
+          <Text style={styles.stopSessionText}>Stop Session</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -90,26 +91,15 @@ const styles = StyleSheet.create({
     backgroundColor: SLOW_PACE_BG,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  cardContainer: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: SLOW_PACE_BG,
-    borderRadius: 32,
-    paddingVertical: 48,
-    paddingHorizontal: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   content: {
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 32,
   },
   devSkipButton: {
     position: 'absolute',
-    top: 20,
     right: 20,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -127,7 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '700',
     color: SLOW_PACE_TEXT,
-    marginBottom: 32,
+    marginBottom: 24,
     fontFamily: Fonts.heading,
     textAlign: 'center',
     letterSpacing: 1,
@@ -136,7 +126,7 @@ const styles = StyleSheet.create({
   lottieContainer: {
     width: 320,
     height: 320,
-    marginBottom: 24,
+    marginBottom: 16,
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
@@ -155,10 +145,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: SLOW_PACE_TEXT,
     marginTop: 0,
-    marginBottom: 20,
+    marginBottom: 24,
     fontFamily: Fonts.bodyBlack,
     textAlign: 'center',
     letterSpacing: -8,
+    paddingHorizontal: 8,
+    width: '100%',
   },
   pauseResumeButton: {
     backgroundColor: SLOW_PACE_BG,

@@ -8,7 +8,6 @@ import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Phase = 'slow' | 'fast';
 
@@ -213,7 +212,7 @@ export default function WalkScreen() {
   const formattedPhaseTime = formatTime(phaseTimeRemaining);
 
   return (
-    <SafeAreaView
+    <View
       style={[
         styles.container,
         { backgroundColor: palette.background },
@@ -290,7 +289,7 @@ export default function WalkScreen() {
           onLongPress={handleLongPress}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
