@@ -1,6 +1,12 @@
 import { Fonts } from '@/constants/theme';
 import LottieView from 'lottie-react-native';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface FastPaceViewProps {
@@ -26,6 +32,12 @@ export function FastPaceView({
   onLongPress,
 }: FastPaceViewProps) {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const horizontalPadding = Math.min(
+    56,
+    Math.max(16, (width - 320) / 2),
+  );
+  const timerMaxWidth = Math.max(width - horizontalPadding * 2, 0);
   
   return (
     <View style={styles.container}>
@@ -40,7 +52,15 @@ export function FastPaceView({
       )}
 
       {/* Content */}
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          {
+            paddingHorizontal: horizontalPadding,
+            paddingTop: insets.top + 24,
+            paddingBottom: insets.bottom + 32,
+          },
+        ]}>
         {/* Title */}
         <TouchableOpacity
           onLongPress={onLongPress}
@@ -61,7 +81,13 @@ export function FastPaceView({
         </View>
 
         {/* Timer */}
-        <Text style={styles.timer}>{phaseTimeRemaining}</Text>
+        <Text
+          style={[styles.timer, { maxWidth: timerMaxWidth }]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.94}>
+          {phaseTimeRemaining}
+        </Text>
 
         {/* Pause/Resume Button */}
         <TouchableOpacity
